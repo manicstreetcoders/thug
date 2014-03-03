@@ -4,7 +4,7 @@
 #based on https://github.com/buffer/thug/blob/master/doc/source/build.rst
 
 echo "Installing needed libraries and tools..."
-sudo apt-get install subversion git python build-essential python-setuptools libboost-python-dev libboost-thread-dev python-dev build-essential git-core autoconf libtool
+sudo apt-get install subversion git python build-essential python-setuptools libboost-python-dev libboost-thread-dev python-dev git-core autoconf libtool
 echo "Installing pip..."
 sudo easy_install pip
 
