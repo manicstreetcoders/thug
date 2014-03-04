@@ -37,6 +37,8 @@ cd ..
 echo "Installing python libraries (beautifulsoup4, html5lib)..."
 sudo pip install beautifulsoup4 1>>setup-ubuntu.log
 sudo pip install html5lib 1>>setup-ubuntu.log
+sudo pip install jsbeautifier 1>>setup-ubuntu.log
+sudo pip install yara 1>>setup-ubuntu.log
 
 
 
