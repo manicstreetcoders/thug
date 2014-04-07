@@ -169,9 +169,6 @@ class Thugd():
 
         if job["extensive"]:
             command.append("-E")
-        if job["timeout"]:
-            command.append("-T")
-            command.append(str(job["timeout"]))
         if job["referer"]:
             command.append("-r")
             command.append(job["referer"])
