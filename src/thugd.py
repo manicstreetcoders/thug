@@ -84,7 +84,7 @@ class Thugd():
             queue.put(line)
         out.close()
 
-    def runProcess(self, exe):
+    def runProcess(self, exe, timeout=60):
         try:
             from Queue import Queue, Empty
         except ImportError:
@@ -93,7 +93,7 @@ class Thugd():
         ON_POSIX = 'posix' in sys.builtin_module_names
 
         start = time.time()
-        end = start + 60
+        end = start + timeout
         interval = 0.25
 
         p = subprocess.Popen(exe, stdout=subprocess.PIPE,
