@@ -11,9 +11,6 @@ import pika
 import sys
 import time
 import json
-import threading
-import os
-import signal
 
 try:
     from configparser import ConfigParser
@@ -79,44 +76,15 @@ class Thugd():
         channel.basic_consume(lambda c, m, p, b: self.callback(c, m, p, b), queue = self.queue)
         channel.start_consuming()
 
-    def enqueue_output(self, out, queue):
-        for line in iter(out.readline, b''):
-            queue.put(line)
-        out.close()
-
     def runProcess(self, exe):
-        try:
-            from Queue import Queue, Empty
-        except ImportError:
-            from queue import Queue, Empty
-
-        ON_POSIX = 'posix' in sys.builtin_module_names
-
-        start = time.time()
-        end = start + 60 
-        interval = 0.25
-
         p = subprocess.Popen(exe, stdout=subprocess.PIPE,
-            bufsize=1,
-            close_fds=ON_POSIX,
             stderr=subprocess.STDOUT)
-        q = Queue()
-        t = threading.Thread(target=self.enqueue_output, args=(p.stdout,q))
-        t.daemon = True
-        t.start()
-
         while(True):
             retcode = p.poll()
+            line = p.stdout.readline()
+            yield line
             if(retcode is not None):
                 break
-            if time.time() >= end:
-                os.kill(p.pid, signal.SIGHUP)
-            try: line = q.get_nowait()
-            except Empty:
-                pass
-            else:
-                yield line
-            time.sleep(interval)
 
     def send_results(self, data):
         credentials = pika.PlainCredentials(self.username, self.password)
@@ -144,8 +112,20 @@ class Thugd():
             return None
 
         respath = os.path.join(self.resdir, str(job["id"]))
-        shutil.copytree(frompath, respath)
+        self.copytree(frompath, respath)
         return os.path.relpath(respath, self.resdir)
+
+    def copytree(self, src, dst, symlinks=False, ignore=None):
+        if not os.path.exists(dst):
+            os.makedirs(dst)
+        for item in os.listdir(src):
+            s = os.path.join(src,item)
+            d = os.path.join(dst,item)
+            if os.path.isdir(s):
+                self.copytree(s, d, symlinks, ignore)
+            else:
+                if not os.path.exists(d) or os.stat(src).st_mtime - os.stat(dst).st_mtime > 1:
+                    shutil.copy2(s,d)
 
     def process(self, job):
         """
