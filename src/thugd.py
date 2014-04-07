@@ -181,7 +181,12 @@ class Thugd():
 
         pathname = None
 
-        for line in self.runProcess(command):
+        if job["timeout"]:
+            timeout = job["timeout"]
+        else:
+            timeout = 60
+
+        for line in self.runProcess(command, timeout):
             if line.startswith("["):
                 print line,
 
