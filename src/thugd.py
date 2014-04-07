@@ -84,7 +84,7 @@ class Thugd():
             queue.put(line)
         out.close()
 
-    def runProcess(self, exe, timeout=60):
+    def runProcess(self, exe, timeout=120):
         try:
             from Queue import Queue, Empty
         except ImportError:
@@ -93,6 +93,7 @@ class Thugd():
         ON_POSIX = 'posix' in sys.builtin_module_names
 
         start = time.time()
+        last_io = start
         end = start + timeout
         interval = 0.25
 
@@ -113,9 +114,12 @@ class Thugd():
                 os.kill(p.pid, signal.SIGHUP)
             try: line = q.get_nowait()
             except Empty:
-                pass
+                if time.time() > last_io + 10:
+                    os.kill(p.pid, signal.SIGINT)
+                    last_io = time.time()
             else:
                 yield line
+                last_io = time.time()
             time.sleep(interval)
 
     def send_results(self, data):
@@ -184,7 +188,7 @@ class Thugd():
         if job["timeout"]:
             timeout = job["timeout"]
         else:
-            timeout = 60
+            timeout = 120
 
         for line in self.runProcess(command, timeout):
             if line.startswith("["):
