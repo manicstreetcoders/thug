@@ -30,6 +30,11 @@ import hashlib
 import datetime
 import logging
 log = logging.getLogger("Thug")
+import sys
+ch = logging.StreamHandler(sys.stdout)
+formatter = logging.Formatter('[%(asctime)s] %(message)s',"%Y-%m-%d %H:%M:%S")
+ch.setFormatter(formatter)
+log.addHandler(ch)
 
 class ThugLogging(BaseLogging):
     eval_min_length_logging = 4
