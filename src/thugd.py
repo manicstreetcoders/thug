@@ -169,7 +169,7 @@ class Thugd():
         """
         print("job" + str(job))
 
-        command = ["python", "thug.py", "-t", str(job["threshold"])]
+        command = ["python", "thug.py"]
 
         if job["extensive"]:
             command.append("-E")
