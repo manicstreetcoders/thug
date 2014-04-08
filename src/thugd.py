@@ -111,7 +111,7 @@ class Thugd():
             if(retcode is not None):
                 break
             if time.time() >= end:
-                os.kill(p.pid, signal.SIGHUP)
+                os.kill(p.pid, signal.SIGKILL)
             try: line = q.get_nowait()
             except Empty:
                 if time.time() > last_io + 10:
