@@ -84,7 +84,7 @@ class Thugd():
             queue.put(line)
         out.close()
 
-    def runProcess(self, exe, timeout=120):
+    def runProcess(self, exe, timeout=300):
         try:
             from Queue import Queue, Empty
         except ImportError:
@@ -188,7 +188,7 @@ class Thugd():
         if job["timeout"]:
             timeout = job["timeout"]
         else:
-            timeout = 120
+            timeout = 300
 
         for line in self.runProcess(command, timeout):
             if line.startswith("["):
