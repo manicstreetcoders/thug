@@ -95,31 +95,51 @@ class Thugd():
         start = time.time()
         last_io = start
         end = start + timeout
-        interval = 0.25
+        interval = 0.10
 
-        p = subprocess.Popen(exe, stdout=subprocess.PIPE,
+        p = subprocess.Popen(exe, 
             bufsize=1,
             close_fds=ON_POSIX,
-            stderr=subprocess.STDOUT)
+            stdout=subprocess.PIPE)
         q = Queue()
         t = threading.Thread(target=self.enqueue_output, args=(p.stdout,q))
         t.daemon = True
         t.start()
 
-        while(True):
+        while True:
             retcode = p.poll()
-            if(retcode is not None):
-                break
+            if retcode is not None:
+                print "[x] Child thug.py died."
+                break;
             if time.time() >= end:
-                os.kill(p.pid, signal.SIGKILL)
+                try:
+                    print "[x] Sending SIGKILL..."
+                    os.kill(p.pid, signal.SIGKILL)
+                except OSError:
+                    pass
             try: line = q.get_nowait()
             except Empty:
                 if time.time() > last_io + 10:
-                    os.kill(p.pid, signal.SIGINT)
-                    last_io = time.time()
+                    try:
+                        print "[x] Sending SIGINT..."
+                        os.kill(p.pid, signal.SIGINT)
+                        last_io = time.time()
+                    except OSError:
+                        pass
             else:
-                yield line
                 last_io = time.time()
+                yield line
+            time.sleep(interval)
+        
+        last_io = time.time()
+        while True:
+            try: line = q.get_nowait()
+            except Empty:
+                if time.time() > last_io + 10:
+                    break
+            else:
+                last_io = time.time()
+                yield line
             time.sleep(interval)
 
     def send_results(self, data):
@@ -192,7 +212,7 @@ class Thugd():
 
         for line in self.runProcess(command, timeout):
             if line.startswith("["):
-                print line,
+                print "* %s" % line
 
             if line.find("] Saving log analysis at ") >= 0:
                 pathname = line.split(" ")[-1].strip()
