@@ -854,6 +854,11 @@ class Window(PyV8.JSClass):
 
         if len(script) > 4:
             log.ThugLogging.add_code_snippet(script, 'Javascript', 'Dynamically_Evaluated', True)
+        # zomo
+        import re
+        match = re.search('iframe', str(script).lower())
+        if match:
+            log.ThugLogging.add_behavior_warn("[iframe injection: window.eval] %s" % str(script))
 
         return self.evalScript(script)
 
