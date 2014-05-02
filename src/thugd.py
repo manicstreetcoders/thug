@@ -189,7 +189,7 @@ class Thugd():
         """
         print("job" + str(job))
 
-        command = ["python", "thug.py"]
+        command = ["python", "thug.py", "--useragent=win7ie80"]
 
         if job["extensive"]:
             command.append("-E")
