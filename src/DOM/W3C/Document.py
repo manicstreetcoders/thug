@@ -148,6 +148,12 @@ class Document(Node, DocumentEvent, DocumentView):
     onCreateElement = None
     
     def createElement(self, tagname, tagvalue = None):
+        # zomo
+        import re
+        match = re.search('iframe', str(tagname).lower())
+        if match:
+            log.ThugLogging.add_behavior_warn("[iframe injection: createElement] %s" % str(tagname))
+
         from DOMImplementation import DOMImplementation
 
         # Internet Explorer 8 and below also support the syntax
