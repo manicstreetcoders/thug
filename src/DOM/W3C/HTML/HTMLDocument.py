@@ -176,6 +176,12 @@ class HTMLDocument(Document):
         self.doc = BeautifulSoup.BeautifulSoup(html, "html5lib")
 
     def write(self, html):
+        # zomo
+        import re
+        match = re.search('iframe', str(html).lower())
+        if match:
+            log.ThugLogging.add_behavior_warn("[iframe injection: document.write] %s" % str(html))
+
         if self._html:
             self._html.write(html)
             return
