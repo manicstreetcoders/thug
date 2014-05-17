@@ -763,7 +763,7 @@ class Window(PyV8.JSClass):
             delattr(self, 'on%s' % (type.lower(), ))
 
     def _CollectGarbage(self):
-        pass
+        log.ThugLogging.add_behavior_warn(description = '[CollectGarbage Detected]', method = 'Dynamic Analysis')
 
     def _navigate(self, location):
         self.location = location
