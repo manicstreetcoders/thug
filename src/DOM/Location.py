@@ -18,6 +18,7 @@
 
 import PyV8
 import logging
+import re
 
 try:
     from . import Window
@@ -53,6 +54,9 @@ class Location(PyV8.JSClass):
         return self._window.url
 
     def set_href(self, url):
+        if re.search('ms-help',str(url).lower()):
+            log.ThugLogging.add_behavior_warn(description = "[ASLR Bypass Detected: ms-help] %s" % str(url), method = 'Dynamic Analysis')
+
         referer = self._window.url
         if referer == url:
             log.warning("Detected redirection from %s to %s... skipping" % (referer, url, ))
